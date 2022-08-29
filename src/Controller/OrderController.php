@@ -31,7 +31,7 @@ class OrderController extends AbstractController
     ): JsonResponse
     {
         $data = $request->toArray();
-        $user = $users->find($data['userId']);
+        $user = $users->findOneBy($data['userEmail']);
         if (!$user) {
             return $this->json([
                 'message' => 'User is not registered'], 404);
