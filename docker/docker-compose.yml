@@ -1,0 +1,61 @@
+version: '3.9'
+services:
+  php-fpm:
+    container_name: kumo_php-fpm
+    build: kumo_php-fpm
+    image: kumo/php-fpm
+    hostname: kumo_php-fpm
+    expose:
+      - 9001
+    depends_on:
+      - mysql
+    volumes:
+      - ../:/var/www
+    networks:
+      - net
+    ports:
+      - "22123:22"
+    restart: always
+  
+  nginx:
+    container_name: kumo_nginx
+    image: 'nginx:1.20'
+    hostname: kumo_nginx
+    depends_on:
+      - php-fpm
+      - mysql
+    volumes:
+      - ../:/var/www
+      - ./kumo_nginx/etc/nginx/conf_d:/etc/nginx/conf.d
+    networks:
+      - net
+    ports:
+      - "80:80"
+    restart: always
+  
+  mysql:
+    container_name: kumo_mysql
+    image: 'mysql:8.0'
+    hostname: kumo_mysql
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: kumo_pass
+    networks:
+      - net
+    ports:
+      - "3306:3306"
+    restart: always
+
+  mongo:
+    container_name: kumo_mongo
+    image: mongo:5.0
+    hostname: kumo_mongo
+    networks:
+      - net
+    ports:
+      - "27017:27017"
+    restart: always
+
+networks:
+  net:
+    name: kumo_net
