@@ -13,10 +13,9 @@ class Order
     /** @ODM\Id */
     private $id;
 
-    /** @ODM\Field(type="int") */
+    /** @ODM\Field(type="string") */
     #[Assert\NotBlank]
-    #[Assert\Positive]
-    private int $userId;
+    private string $userEmail;
 
     /** @ODM\Field(type="int") */
     #[Assert\NotBlank]
@@ -27,6 +26,11 @@ class Order
     #[Assert\NotBlank]
     #[Assert\PositiveOrZero]
     private int $unitPrice;
+
+    /** @ODM\Field(type="float") */
+    #[Assert\NotBlank]
+    #[Assert\PositiveOrZero]
+    private float $discount;
 
     /** @ODM\Field(type="string") */
     #[Assert\NotBlank]
@@ -51,20 +55,20 @@ class Order
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getUserId(): int
+    public function getUserEmail(): string
     {
-        return $this->userId;
+        return $this->userEmail;
     }
 
     /**
-     * @param int $userId
+     * @param string $userEmail
      * @return Order
      */
-    public function setUserId(int $userId): Order
+    public function setUserEmail(string $userEmail): Order
     {
-        $this->userId = $userId;
+        $this->userEmail = $userEmail;
         return $this;
     }
 
@@ -105,6 +109,24 @@ class Order
     }
 
     /**
+     * @return float
+     */
+    public function getDiscount(): float
+    {
+        return $this->discount;
+    }
+
+    /**
+     * @param float $discount
+     * @return Order
+     */
+    public function setDiscount(float $discount): Order
+    {
+        $this->discount = $discount;
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getProductName(): string
@@ -120,9 +142,5 @@ class Order
     {
         $this->productName = $productName;
         return $this;
-    }
-
-    public function getTotal(): int{
-        return $this->amount*$this->unitPrice;
     }
 }
