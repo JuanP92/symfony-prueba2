@@ -30,6 +30,7 @@ class Order
     /** @ODM\Field(type="float") */
     #[Assert\NotBlank]
     #[Assert\PositiveOrZero]
+    #[Assert\Range(min: 0,max: 1)]
     private float $discount;
 
     /** @ODM\Field(type="string") */
@@ -142,5 +143,13 @@ class Order
     {
         $this->productName = $productName;
         return $this;
+    }
+    /**
+     * @param string $productName
+     * @return Order
+     */
+    public function getTotal(): int
+    {
+        return $this->amount * $this->unitPrice * $this->discount;
     }
 }

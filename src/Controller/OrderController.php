@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Document\Order;
 use App\Entity\User;
+use App\Form\UserType;
 use App\Repository\UserRepository;
 use App\Form\OrderType;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -27,14 +28,27 @@ class OrderController extends AbstractController
     public function create(
         Request         $request,
         DocumentManager $manager,
-        UserRepository  $users
+        UserRepository  $userRepository
     ): JsonResponse
     {
         $data = $request->toArray();
-        $user = $users->findOneBy($data['userEmail']);
+        $user = $userRepository->findOneBy($data['userEmail']);
         if (!$user) {
-            return $this->json([
-                'message' => 'User is not registered'], 404);
+            $user = new User();
+            $userData = $data['user'];
+            $form = $this->createForm(UserType::class, $user);
+            $form->submit($userData);
+            if (!$form->isValid()) {
+                $errors = $form->getErrors(true);
+                $msg = [];
+                foreach ($errors as $error) {
+                    $msg[] = $error->getMessage();
+                }
+
+                return $this->json(['errors' => $msg], 400);
+            }
+
+            $userRepository->add($user, true);
         }
 
         $order = new Order();
@@ -46,6 +60,7 @@ class OrderController extends AbstractController
             foreach ($errors as $error) {
                 $msg[] = $error->getMessage();
             }
+
             return $this->json(['errors' => $msg], 400);
         }
 
@@ -67,16 +82,18 @@ class OrderController extends AbstractController
         }
 
         $repository = $manager->getRepository(Order::class);
-        $orders = $repository->findby(['userId' => $user->getId()]);
+        $orders = $repository->findby(['userEmail' => $user->getEmail()]);
 
         return $this->json($orders);
     }
 
-    #[Route('/order/update/{id}', name: 'app_order_update', methods: ['PUT'])]
+    #[Route('/order/{email}/update/{id}', name: 'app_order_update', methods: ['PUT'])]
     public function update(
         string          $id,
+        string          $email,
         Request         $request,
-        DocumentManager $manager
+        DocumentManager $manager,
+        UserRepository $userRepository
     ): JsonResponse
     {
         $order = $manager->getRepository(Order::class)->find($id);
