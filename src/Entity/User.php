@@ -6,6 +6,8 @@ use App\Repository\UserRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Annotation\Ignore;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`users`')]
@@ -18,15 +20,20 @@ class User
     private int $id;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     private string $name;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     private string $surname;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Email]
     private string $email;
 
     #[ORM\Column(type: Types::BOOLEAN)]
+    #[Ignore]
     private bool $flag;
 
     /**

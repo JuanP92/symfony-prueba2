@@ -3,7 +3,7 @@
 namespace App\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
-use phpDocumentor\Reflection\Types\Integer;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Form\FormTypeInterface;
 
@@ -148,6 +148,7 @@ class Order
      * @param string $productName
      * @return Order
      */
+    #[Groups(['details'])]
     public function getTotal(): int
     {
         return $this->amount * $this->unitPrice * $this->discount;

@@ -87,13 +87,12 @@ class OrderController extends AbstractController
         return $this->json($orders);
     }
 
-    #[Route('/order/{email}/update/{id}', name: 'app_order_update', methods: ['PUT'])]
+    #[Route('/order/update/{id}', name: 'app_order_update', methods: ['PUT'])]
     public function update(
         string          $id,
-        string          $email,
         Request         $request,
         DocumentManager $manager,
-        UserRepository $userRepository
+        UserRepository  $userRepository
     ): JsonResponse
     {
         $order = $manager->getRepository(Order::class)->find($id);
@@ -122,25 +121,29 @@ class OrderController extends AbstractController
         ]);
     }
 
-    #[Route('/order/delete/{id}', name: 'app_order_delete', methods: ['DELETE'])]
+    #[Route('/order/delete/{email}', name: 'app_order_delete', methods: ['DELETE'])]
     public function delete(
-        string          $id,
+        string          $email,
         DocumentManager $manager
     ): JsonResponse
     {
 
-        $order = $manager->find(Order::class, $id);
-        if (!$order) {
+        $orders = $manager->getRepository(Order::class)
+            ->findby(['userEmail' => $email]);
+        if (!$orders) {
             return $this->json([
-                'message' => 'Order not found'], 404);
+                'message' => 'Orders not found'], 404);
         }
 
-        $manager->remove($order);
-        $manager->flush();
+        $manager->createQueryBuilder(Order::class)
+            ->remove()
+            ->field("userEmail")
+            ->equals($email)
+            ->getQuery()
+            ->execute();
 
         return $this->json([
-            'success' => true,
-            'order' => $order
+            'success' => true
         ]);
     }
 }
