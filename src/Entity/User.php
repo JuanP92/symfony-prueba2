@@ -34,7 +34,7 @@ class User
 
     #[ORM\Column(type: Types::BOOLEAN)]
     #[Ignore]
-    private bool $flag;
+    private bool $flag = false;
 
     /**
      * @return int
@@ -105,6 +105,24 @@ class User
     public function setEmail(string $email): User
     {
         $this->email = $email;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFlag(): bool
+    {
+        return $this->flag;
+    }
+
+    /**
+     * @param bool $flag
+     * @return User
+     */
+    public function setFlag(bool $flag): User
+    {
+        $this->flag = $flag;
         return $this;
     }
 }
