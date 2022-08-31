@@ -76,11 +76,6 @@ class OrderController extends AbstractController
         DocumentManager $manager
     ): JsonResponse
     {
-        if (!$user) {
-            return $this->json([
-                'message' => 'User not found'], 404);
-        }
-
         $repository = $manager->getRepository(Order::class);
         $orders = $repository->findby(['userEmail' => $user->getEmail()]);
 
@@ -115,10 +110,7 @@ class OrderController extends AbstractController
 
         $manager->flush();
 
-        return $this->json([
-            'success' => true,
-            'order' => $order
-        ]);
+        return $this->json([]);
     }
 
     #[Route('/order/delete/{email}', name: 'app_order_delete', methods: ['DELETE'])]
@@ -142,8 +134,6 @@ class OrderController extends AbstractController
             ->getQuery()
             ->execute();
 
-        return $this->json([
-            'success' => true
-        ]);
+        return $this->json([]);
     }
 }

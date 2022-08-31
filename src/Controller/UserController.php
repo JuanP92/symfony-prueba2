@@ -9,6 +9,7 @@ use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class UserController extends AbstractController
@@ -25,25 +26,24 @@ class UserController extends AbstractController
         UserRepository $repository
     ): JsonResponse
     {
-        $data = $request->toArray();
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
-        $form->submit($data);
-        if (!$form->isValid()) {
+        $form->handleRequest($request);
+        if (!$form->isSubmitted()||!$form->isValid()) {
             $errors = $form->getErrors(true);
             $msg = [];
             foreach ($errors as $error) {
                 $msg[] = $error->getMessage();
             }
-            return $this->json(['errors' => $msg], 400);
+            return $this->json(['errors' => $msg], Response::HTTP_BAD_REQUEST);
         }
 
         $repository->add($user, true);
 
-        return $this->json(['success' => true]);
+        return $this->json([],Response::HTTP_CREATED);
     }
 
-    #[Route('/user/update/{id}', name: 'app_user_update', methods: ['PUT'])]
+    #[Route('/user/update/{email}', name: 'app_user_update', methods: ['PUT'])]
     public function update(
         User            $user,
         ManagerRegistry $doctrine,
@@ -51,42 +51,33 @@ class UserController extends AbstractController
     ): JsonResponse
     {
         $manager = $doctrine->getManager();
-        if (!$user) {
-            return $this->json(['message' => 'User not found'], 404);
-        }
-
-        $data = $request->toArray();
         $form = $this->createForm(UserType::class, $user);
-        $form->submit($data);
-        if (!$form->isValid()) {
+        $form->handleRequest($request);
+
+        if (!$form->isSubmitted()||!$form->isValid()) {
             $errors = $form->getErrors(true);
             $msg = [];
             foreach ($errors as $error) {
                 $msg[] = $error->getMessage();
             }
 
-            return $this->json(['errors' => $msg], 400);
+            return $this->json(['errors' => $msg], Response::HTTP_BAD_REQUEST);
         }
 
         $manager->flush();
 
-        return $this->json(['success' => true], 201);
+        return $this->json([]);
     }
 
-    #[Route('/user/delete/{id}', name: 'app_user_delete', methods: ['DELETE'])]
+    #[Route('/user/delete/{email}', name: 'app_user_delete', methods: ['DELETE'])]
     public function delete(
         User           $user,
         UserRepository $repository
     ): JsonResponse
     {
-        if (!$user) {
-            return $this->json([
-                'message' => 'User not found'], 404);
-        }
-
         $repository->remove($user, true);
 
-        return $this->json(['success' => true]);
+        return $this->json([], Response::HTTP_NO_CONTENT);
     }
 
     #[Route('/user/detail/{email}', name: 'app_user_get', methods: ['GET'])]
@@ -94,11 +85,6 @@ class UserController extends AbstractController
         User $user
     ): JsonResponse
     {
-        if (!$user) {
-            return $this->json([
-                'message' => 'User not found'], 404);
-        }
-
         return $this->json($user);
     }
 }

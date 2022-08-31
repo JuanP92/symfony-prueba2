@@ -46,16 +46,6 @@ class Order
     }
 
     /**
-     * @param mixed $id
-     * @return Order
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getUserEmail(): string
@@ -103,7 +93,7 @@ class Order
      * @param int $unitPrice
      * @return Order
      */
-    public function setUnitPrice(int $unitPrice): Order
+    public function setUnitPrice(int $unitPrice): self
     {
         $this->unitPrice = $unitPrice;
         return $this;
@@ -152,7 +142,6 @@ class Order
     #[Groups(['details'])]
     public function getTotal(): int
     {
-        return ($this->amount * $this->unitPrice)
-            - ($this->unitPrice * $this->discount);
+        return $this->amount * $this->unitPrice * $this->discount;
     }
 }

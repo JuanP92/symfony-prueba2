@@ -34,7 +34,7 @@ class User
 
     #[ORM\Column(type: Types::BOOLEAN)]
     #[Ignore]
-    private bool $flag = false;
+    private bool $emailFirstOrder = false;
 
     /**
      * @return int
@@ -42,16 +42,6 @@ class User
     public function getId(): int
     {
         return $this->id;
-    }
-
-    /**
-     * @param int $id
-     * @return User
-     */
-    public function setId(int $id): User
-    {
-        $this->id = $id;
-        return $this;
     }
 
     /**
@@ -111,18 +101,18 @@ class User
     /**
      * @return bool
      */
-    public function isFlag(): bool
+    public function isEmailFirstOrder(): bool
     {
-        return $this->flag;
+        return $this->emailFirstOrder;
     }
 
     /**
-     * @param bool $flag
+     * @param bool $emailFirstOrder
      * @return User
      */
-    public function setFlag(bool $flag): User
+    public function setEmailFirstOrder(bool $emailFirstOrder): User
     {
-        $this->flag = $flag;
+        $this->emailFirstOrder = $emailFirstOrder;
         return $this;
     }
 }
