@@ -9,7 +9,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Form\FormTypeInterface;
 
 /** @ODM\Document */
-#[UniqueEntity('userEmail')]
 class Order
 {
     /** @ODM\Id */
@@ -115,7 +114,7 @@ class Order
      */
     public function setDiscount(float $discount): Order
     {
-        $this->discount = $discount;
+        $this->discount = $discount/100;
         return $this;
     }
 

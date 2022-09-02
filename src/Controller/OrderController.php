@@ -32,7 +32,7 @@ class OrderController extends AbstractController
     ): JsonResponse
     {
         $data = $request->toArray();
-        $user = $userRepository->findOneBy($data['userEmail']);
+        $user = $userRepository->findOneBy(['email'=>$data['userEmail']]);
         if (!$user) {
             $user = new User();
             $userData = $data['user'];
