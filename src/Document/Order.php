@@ -3,11 +3,13 @@
 namespace App\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Form\FormTypeInterface;
 
 /** @ODM\Document */
+#[UniqueEntity('userEmail')]
 class Order
 {
     /** @ODM\Id */

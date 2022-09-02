@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class OrderController extends AbstractController
 {
-    #[Route('/order/list', name: 'app_order_list')]
+    #[Route('/order/list', name: 'app_order_list', methods: ['GET'])]
     public function index(DocumentManager $manager): JsonResponse
     {
         $repository = $manager->getRepository(Order::class);
@@ -82,23 +82,20 @@ class OrderController extends AbstractController
         return $this->json($orders);
     }
 
-    #[Route('/order/update/{id}', name: 'app_order_update', methods: ['PUT'])]
+    #[Route('/order/update/{userEmail}', name: 'app_order_update', methods: ['PUT'])]
     public function update(
-        string          $id,
+        Order           $order,
         Request         $request,
-        DocumentManager $manager,
-        UserRepository  $userRepository
+        DocumentManager $manager
     ): JsonResponse
     {
-        $order = $manager->getRepository(Order::class)->find($id);
-        $data = $request->toArray();
         if (!$order) {
             return $this->json([
                 'message' => 'Order not found'], 404);
         }
 
         $form = $this->createForm(OrderType::class, $order);
-        $form->submit($data);
+        $form->handleRequest($request);
         if (!$form->isValid()) {
             $errors = $form->getErrors(true);
             $msg = [];
@@ -113,26 +110,19 @@ class OrderController extends AbstractController
         return $this->json([]);
     }
 
-    #[Route('/order/delete/{email}', name: 'app_order_delete', methods: ['DELETE'])]
+    #[Route('/order/delete/{userEmail}', name: 'app_order_delete', methods: ['DELETE'])]
     public function delete(
-        string          $email,
+        Order           $order,
         DocumentManager $manager
     ): JsonResponse
     {
-
-        $orders = $manager->getRepository(Order::class)
-            ->findby(['userEmail' => $email]);
-        if (!$orders) {
+        if (!$order) {
             return $this->json([
                 'message' => 'Orders not found'], 404);
         }
 
-        $manager->createQueryBuilder(Order::class)
-            ->remove()
-            ->field("userEmail")
-            ->equals($email)
-            ->getQuery()
-            ->execute();
+        $manager->remove($order);
+        $manager->flush();
 
         return $this->json([]);
     }
